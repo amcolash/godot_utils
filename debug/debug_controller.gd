@@ -2,18 +2,38 @@
 class_name DebugController
 extends Node
 
-var custom_actions: Dictionary[String, Callable] = {}
+var custom_actions: Dictionary[String, Callable] = { }
+
 
 func _ready() -> void:
   process_mode = Node.PROCESS_MODE_ALWAYS
+  get_tree().node_added.connect(_on_node_added)
+  _connect_window(get_tree().root)
+
+
+func _on_node_added(node: Node) -> void:
+  if node is Window:
+    _connect_window(node as Window)
+
+
+func _connect_window(win: Window) -> void:
+  if win and not win.window_input.is_connected(_handle_input):
+    win.window_input.connect(_handle_input)
+
 
 func register_action(action: String, callback: Callable) -> void:
   custom_actions[action] = callback
 
+
 func unregister_action(action: String) -> void:
   custom_actions.erase(action)
 
+
 func _input(event: InputEvent) -> void:
+  _handle_input(event)
+
+
+func _handle_input(event: InputEvent) -> void:
   if !OS.is_debug_build():
     return
 
