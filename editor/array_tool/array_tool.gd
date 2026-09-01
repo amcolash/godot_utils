@@ -37,8 +37,8 @@ func _setup() -> void:
   toolbar_button_2d.flat = true
   toolbar_button_2d.tooltip_text = "Node Array & Distribute Tool (2D)"
   if base_control:
-    if base_control.has_theme_icon("VisualInstance3D", "EditorIcons"):
-      toolbar_button_2d.icon = base_control.get_theme_icon("VisualInstance3D", "EditorIcons")
+    if base_control.has_theme_icon("CanvasItem", "EditorIcons"):
+      toolbar_button_2d.icon = base_control.get_theme_icon("CanvasItem", "EditorIcons")
     elif base_control.has_theme_icon("Node2D", "EditorIcons"):
       toolbar_button_2d.icon = base_control.get_theme_icon("Node2D", "EditorIcons")
   toolbar_button_2d.pressed.connect(
@@ -61,12 +61,21 @@ func _setup() -> void:
   popup_panel.add_child(array_ui)
   plugin.add_child(popup_panel)
 
+  popup_panel.popup_hide.connect(
+    func():
+      if array_ui and array_ui.has_method("clear_preview"):
+        array_ui.clear_preview(),
+  )
+
   var selection = plugin.get_editor_interface().get_selection()
   if selection:
     selection.selection_changed.connect(_on_selection_changed)
 
 
 func cleanup() -> void:
+  if array_ui and array_ui.has_method("clear_preview"):
+    array_ui.clear_preview()
+
   if toolbar_button_3d:
     plugin.remove_control_from_container(
       EditorPlugin.CONTAINER_SPATIAL_EDITOR_MENU,
@@ -102,7 +111,6 @@ func _toggle_popup(from_button: Button) -> void:
     var btn_rect = from_button.get_global_rect()
     var popup_pos = Vector2i(int(btn_rect.position.x), int(btn_rect.end.y + 4 * ed_scale))
 
-    # Base scaled size to prevent Godot from expanding height to fullscreen before layout is ready
     var req_size = Vector2i(int(300.0 * ed_scale), int(230.0 * ed_scale))
     if array_ui:
       var min_sz = array_ui.get_combined_minimum_size()
