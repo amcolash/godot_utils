@@ -118,9 +118,7 @@ func _on_right() -> void:
 func _gui_input(event: InputEvent) -> void:
   if event.is_action_pressed("ui_left"):
     _on_left()
-    UISounds.on_button_pressed()
     accept_event()
   elif event.is_action_pressed("ui_right"):
     _on_right()
-    UISounds.on_button_pressed()
     accept_event()
