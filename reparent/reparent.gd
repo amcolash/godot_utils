@@ -1,3 +1,5 @@
+@icon("res://addons/godot_utils/icons/arrow_turn_left_up.svg")
+
 # A simple component to reparent a node when added to a scene
 class_name Reparent
 extends Node
