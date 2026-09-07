@@ -8,7 +8,7 @@ signal value_changed(index: int)
 @export var left_arrow_texture: Texture2D
 @export var right_arrow_texture: Texture2D
 @export var separation: int = 16
-@export var active_index: int = 2:
+@export var active_index: int = 0:
   set(val):
     active_index = val
     if options_node:
@@ -77,10 +77,10 @@ func _get_focus_style() -> StyleBox:
         style.content_margin_top = 0.0
         style.content_margin_right = 0.0
         style.content_margin_bottom = 0.0
-        style.expand_margin_left = 4.0
-        style.expand_margin_top = 4.0
-        style.expand_margin_right = 4.0
-        style.expand_margin_bottom = 4.0
+        style.expand_margin_left = separation / 2
+        style.expand_margin_top = separation / 2
+        style.expand_margin_right = separation / 2
+        style.expand_margin_bottom = separation / 2
       _focus_style = style
   return _focus_style
 
