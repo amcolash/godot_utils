@@ -18,33 +18,40 @@ var options_node: PanelContainer
 var total: int = 0
 var _focus_style: StyleBox
 var _empty_style: StyleBoxEmpty = StyleBoxEmpty.new()
+var _pending_options: Array[String] = []
 
 
 func _ready() -> void:
   focus_mode = Control.FOCUS_ALL
   add_theme_constant_override("separation", separation)
 
-  options_node = PanelContainer.new()
-  options_node.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-  options_node.custom_minimum_size = Vector2(32, 32)
-  options_node.add_theme_stylebox_override("panel", _empty_style)
+  if not options_node:
+    options_node = PanelContainer.new()
+    options_node.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+    options_node.custom_minimum_size = Vector2(32, 32)
+    options_node.add_theme_stylebox_override("panel", _empty_style)
 
-  total = get_child_count()
-  for child in get_children():
-    child.reparent(options_node)
+    total = get_child_count()
+    for child in get_children():
+      child.reparent(options_node)
 
-  var arrow_left = _setup_button(left_arrow_texture, _on_left)
-  var arrow_right = _setup_button(right_arrow_texture, _on_right)
+    var arrow_left = _setup_button(left_arrow_texture, _on_left)
+    var arrow_right = _setup_button(right_arrow_texture, _on_right)
 
-  add_child(arrow_left)
-  add_child(options_node)
-  add_child(arrow_right)
+    add_child(arrow_left)
+    add_child(options_node)
+    add_child(arrow_right)
 
-  focus_entered.connect(_update_focus)
-  focus_exited.connect(_update_focus)
+    focus_entered.connect(_update_focus)
+    focus_exited.connect(_update_focus)
 
-  update_option()
-  _update_focus()
+  if not _pending_options.is_empty():
+    var opts = _pending_options.duplicate()
+    _pending_options.clear()
+    set_options(opts)
+  else:
+    update_option()
+    _update_focus()
 
 
 func _setup_button(texture: Texture2D, callback: Callable) -> TextureButton:
@@ -58,6 +65,22 @@ func _setup_button(texture: Texture2D, callback: Callable) -> TextureButton:
   button.pressed.connect(callback)
 
   return button
+
+
+func set_options(option_names: Array[String]) -> void:
+  if not is_node_ready() or not options_node:
+    _pending_options = option_names.duplicate()
+    return
+  for child in options_node.get_children():
+    options_node.remove_child(child)
+    child.queue_free()
+  for opt_name in option_names:
+    var lbl = Label.new()
+    lbl.text = opt_name
+    options_node.add_child(lbl)
+  total = option_names.size()
+  active_index = clampi(active_index, 0, maxi(0, total - 1))
+  update_option()
 
 
 func update_option() -> void:
