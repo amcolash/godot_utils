@@ -3,6 +3,7 @@ extends EditorPlugin
 
 var dock
 var array_tool
+var label_size_inspector_plugin
 
 
 func _enter_tree() -> void:
@@ -17,6 +18,10 @@ func _enter_tree() -> void:
   var array_tool_script = preload("res://addons/godot_utils/editor/array_tool/array_tool.gd")
   array_tool = array_tool_script.new(self)
 
+  var label_size_script = preload("res://addons/godot_utils/editor/label_size_inspector_plugin.gd")
+  label_size_inspector_plugin = label_size_script.new()
+  add_inspector_plugin(label_size_inspector_plugin)
+
 
 func _exit_tree() -> void:
   if dock:
@@ -27,3 +32,7 @@ func _exit_tree() -> void:
   if array_tool:
     array_tool.cleanup()
     array_tool = null
+
+  if label_size_inspector_plugin:
+    remove_inspector_plugin(label_size_inspector_plugin)
+    label_size_inspector_plugin = null
